@@ -30,7 +30,7 @@ class TelegramParser(object):
         for line_value in line_values:
             line_value = line_value.strip()
             # skip empty lines or telegram end
-            if not line_value or line_value == '!':
+            if not line_value or line_value.startswith('!'):
                 continue
             # skip telegram header, but log meter brand/type
             if line_value.startswith('/'):
