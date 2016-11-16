@@ -1,11 +1,9 @@
 import logging
 import re
 
-from .objects import MBusObject, MBusObjectV2_2, CosemObject
 from .exceptions import ParseError
 from .obis_references import GAS_METER_READING
-
-logger = logging.getLogger(__name__)
+from .objects import CosemObject, MBusObject, MBusObjectV2_2
 
 
 class TelegramParser(object):
@@ -16,6 +14,7 @@ class TelegramParser(object):
         :type telegram_specification: dict
         """
         self.telegram_specification = telegram_specification
+        self.log = logging.getLogger(__name__)
 
     def _find_line_parser(self, line_value):
 
@@ -29,19 +28,28 @@ class TelegramParser(object):
         telegram = {}
 
         for line_value in line_values:
-            obis_reference, dsmr_object = self.parse_line(line_value.strip())
+            line_value = line_value.strip()
+            # skip empty lines or telegram end
+            if not line_value or line_value == '!':
+                continue
+            # skip telegram header, but log meter brand/type
+            if line_value.startswith('/'):
+                self.log.debug('meter type: %s', line_value[1:])
+                continue
+
+            obis_reference, dsmr_object = self.parse_line(line_value)
 
             telegram[obis_reference] = dsmr_object
 
         return telegram
 
     def parse_line(self, line_value):
-        logger.debug('Parsing line\'%s\'', line_value)
+        self.log.debug('Parsing line\'%s\'', line_value)
 
         obis_reference, parser = self._find_line_parser(line_value)
 
         if not parser:
-            logger.warning("No line class found for: '%s'", line_value)
+            self.log.warning("No line class found for: '%s'", line_value)
             return None, None
 
         return obis_reference, parser.parse(line_value)

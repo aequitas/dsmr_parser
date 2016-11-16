@@ -1,5 +1,8 @@
-import serial
 import asyncio
+import logging
+
+import serial
+
 import serial_asyncio
 from dsmr_parser.parsers import TelegramParser, TelegramParserV2_2
 
@@ -46,6 +49,8 @@ class SerialReader(object):
             telegram_parser = TelegramParser
         self.telegram_parser = telegram_parser(telegram_specification)
 
+        self.log = logging.getLogger(__name__)
+
     def read(self):
         """
         Read complete DSMR telegram's from the serial interface and parse it
@@ -53,6 +58,8 @@ class SerialReader(object):
 
         :rtype dict
         """
+        self.log.debug('opening serial connection: %s', self.serial_settings)
+
         with serial.Serial(**self.serial_settings) as serial_handle:
             telegram = []
 
