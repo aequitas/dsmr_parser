@@ -95,6 +95,7 @@ class AsyncSerialReader(SerialReader):
 
         :rtype Generator/Async
         """
+        self.log.debug('opening serial connection: %s', self.serial_settings)
         # create Serial StreamReader
         conn = serial_asyncio.open_serial_connection(**self.serial_settings)
         reader, _ = yield from conn
