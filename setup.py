@@ -17,6 +17,9 @@ setup(
         'dlms_cosem==21.3.2'
     ],
     entry_points={
-        'console_scripts': ['dsmr_console=dsmr_parser.__main__:console']
+        'console_scripts': [
+            'dsmr_console=dsmr_parser.__main__:console',
+            'dsmr_exporter=dsmr_parser.__main__:exporter',
+        ]
     },
 )
